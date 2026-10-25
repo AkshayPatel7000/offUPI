@@ -49,6 +49,32 @@ describe('UPI QR Parsing and Validation', () => {
     const result = parseUpiQr('mailto:someone@example.com');
     expect(result.success).toBe(false);
   });
+
+  it('parses URLs containing pa query parameter', () => {
+    const result = parseUpiQr('https://upiqr.in/?pa=kirana@okhdfcbank&pn=Kirana+Store');
+    expect(result.success).toBe(true);
+    expect(result.data.upiId).toBe('kirana@okhdfcbank');
+    expect(result.data.merchantName).toBe('Kirana Store');
+  });
+
+  it('parses EMVCo BharatQR codes used by Indian merchant standees', () => {
+    // Standard BharatQR TLV string with Tag 26 subtag 01 as VPA
+    // Tag 00: len 02 val 01
+    // Tag 01: len 02 val 12
+    // Tag 26: len 31 (subtag 00 len 03 "upi", subtag 01 len 20 "merchantpayee@okaxis")
+    // Tag 59: len 14 val "Merchant Payee"
+    const bharatQr = '00020101021226310003upi0120merchantpayee@okaxis5914Merchant Payee6304ABCD';
+    const result = parseUpiQr(bharatQr);
+    expect(result.success).toBe(true);
+    expect(result.data.upiId).toBe('merchantpayee@okaxis');
+    expect(result.data.merchantName).toBe('Merchant Payee');
+  });
+
+  it('extracts UPI ID from strings with embedded UPI handles', () => {
+    const result = parseUpiQr('Pay via UPI to coffeehouse@okaxis on GPay');
+    expect(result.success).toBe(true);
+    expect(result.data.upiId).toBe('coffeehouse@okaxis');
+  });
 });
 
 describe('Zod Validation Schemas', () => {

@@ -18,7 +18,6 @@ import { VoiceGuideScreen } from './screens/VoiceGuideScreen';
 import { PaymentStatusScreen } from './screens/PaymentStatusScreen';
 import { HelpScreen } from './screens/HelpScreen';
 import { SettingsModal } from './screens/SettingsModal';
-import { DialerModal } from './components/DialerModal';
 import {
   getUserPreferences,
   saveUserPreferences,
@@ -35,8 +34,6 @@ function App() {
   const [initialScanManualMode, setInitialScanManualMode] = useState(false);
   const [initialScanUploadMode, setInitialScanUploadMode] = useState(false);
 
-  const [isDialerOpen, setIsDialerOpen] = useState(false);
-  const [dialerCode, setDialerCode] = useState('*99#');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
@@ -64,20 +61,14 @@ function App() {
 
   const handleQrScanned = (qrResult) => {
     setScannedQrData(qrResult);
-    if (qrResult.amount) {
-      setPaymentData({ amount: qrResult.amount, note: qrResult.note || null });
-    }
+    setPaymentData({
+      amount: qrResult.amount || 250,
+      note: qrResult.note || null,
+    });
     setCurrentScreen('qr_details');
     showToast('QR Scanned');
   };
 
-  const handleContinueFromDetails = () => {
-    if (scannedQrData?.hasFixedAmount) {
-      setCurrentScreen('choose_method');
-    } else {
-      setCurrentScreen('enter_amount');
-    }
-  };
 
   const handleContinueFromAmount = (enteredData) => {
     setPaymentData(enteredData);
@@ -93,14 +84,21 @@ function App() {
     }
   };
 
-  const handleOpenDialer = (code) => {
-    setDialerCode(code);
-    setIsDialerOpen(true);
-  };
+  const handleOpenDialer = (code, carrier = selectedCarrier) => {
+    const isVoice = code === '124PAY' || carrier?.id === 'jio';
+    const telNumber = isVoice ? '08045163666' : (code || '*99#');
+    const telUri = isVoice
+      ? 'tel:08045163666'
+      : `tel:${telNumber.replace(/#/g, '%23')}`;
 
-  const handleCompleteDialerHandoff = () => {
-    setIsDialerOpen(false);
+    try {
+      window.location.href = telUri;
+    } catch (err) {
+      console.warn('Native dialer redirect:', err);
+    }
+
     setCurrentScreen('payment_status');
+    showToast(`Redirecting to phone dialer (${isVoice ? '124PAY' : '*99#'})...`);
   };
 
   const handleToggleDarkMode = () => {
@@ -161,7 +159,7 @@ function App() {
         {currentScreen === 'home' && (
           <HomeScreen
             carrier={selectedCarrier}
-            onSwitchCarrier={() => setCurrentScreen('choose_method')}
+            onSwitchCarrier={() => setIsSettingsOpen(true)}
             onNavigate={(target, opts) => {
               setInitialScanManualMode(Boolean(opts?.manualMode));
               setInitialScanUploadMode(Boolean(opts?.uploadMode));
@@ -182,8 +180,10 @@ function App() {
         {currentScreen === 'qr_details' && (
           <QrDetailsScreen
             qrData={scannedQrData}
+            carrier={selectedCarrier}
+            onSwitchCarrier={(carrier) => setSelectedCarrier(carrier)}
             onBack={() => setCurrentScreen('scan')}
-            onContinue={handleContinueFromDetails}
+            onOpenDialer={handleOpenDialer}
             onShowToast={showToast}
           />
         )}
@@ -278,18 +278,6 @@ function App() {
           </button>
         </nav>
       )}
-
-      {/* Interactive Phone Dialer Modal */}
-      <DialerModal
-        isOpen={isDialerOpen}
-        onClose={() => setIsDialerOpen(false)}
-        initialCode={dialerCode}
-        merchantName={scannedQrData?.merchantName || 'Merchant Payee'}
-        upiId={scannedQrData?.upiId || 'merchant@upi'}
-        amount={paymentData?.amount || 250}
-        carrier={selectedCarrier.name}
-        onCompleteHandoff={handleCompleteDialerHandoff}
-      />
 
       {/* Settings Modal */}
       <SettingsModal

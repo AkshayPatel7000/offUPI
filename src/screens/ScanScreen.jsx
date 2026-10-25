@@ -96,27 +96,61 @@ export function ScanScreen({
     };
   }, [manualMode]);
 
-  // Frame scanner loop using jsQR
+  // Frame scanner loop using BarcodeDetector + jsQR fallback
   useEffect(() => {
     if (!hasCameraPermission || manualMode) return;
 
     const canvas = canvasRef.current || document.createElement('canvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    let barcodeDetector = null;
 
-    function scanFrame() {
+    if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
+      try {
+        barcodeDetector = new window.BarcodeDetector({ formats: ['qr_code'] });
+      } catch {
+        barcodeDetector = null;
+      }
+    }
+
+    let isScanning = true;
+
+    async function scanFrame() {
+      if (!isScanning) return;
+
       if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA) {
+        // 1. Try native hardware BarcodeDetector first if available (fastest & most accurate)
+        if (barcodeDetector) {
+          try {
+            const barcodes = await barcodeDetector.detect(videoRef.current);
+            if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
+              const parsed = parseUpiQr(barcodes[0].rawValue);
+              if (parsed.success) {
+                isScanning = false;
+                onQrScanned(parsed.data);
+                return;
+              } else {
+                setErrorMessage(parsed.error);
+              }
+            }
+          } catch {
+            // BarcodeDetector error, fallback to jsQR
+          }
+        }
+
+        // 2. jsQR fallback with attemptBoth for inverted & low-contrast QR codes
         canvas.width = videoRef.current.videoWidth;
         canvas.height = videoRef.current.videoHeight;
         ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const code = jsQR(imageData.data, imageData.width, imageData.height, {
-          inversionAttempts: 'dontInvert',
+          inversionAttempts: 'attemptBoth',
         });
 
         if (code && code.data) {
           const parsed = parseUpiQr(code.data);
           if (parsed.success) {
+            isScanning = false;
             onQrScanned(parsed.data);
             return;
           } else {
@@ -124,12 +158,16 @@ export function ScanScreen({
           }
         }
       }
-      animationFrameId.current = requestAnimationFrame(scanFrame);
+
+      if (isScanning) {
+        animationFrameId.current = requestAnimationFrame(scanFrame);
+      }
     }
 
     animationFrameId.current = requestAnimationFrame(scanFrame);
 
     return () => {
+      isScanning = false;
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
@@ -158,14 +196,41 @@ export function ScanScreen({
     const reader = new FileReader();
     reader.onload = (event) => {
       const img = new Image();
-      img.onload = () => {
+      img.onload = async () => {
+        // Try native BarcodeDetector on image first
+        if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
+          try {
+            const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+            const barcodes = await detector.detect(img);
+            if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
+              const parsed = parseUpiQr(barcodes[0].rawValue);
+              if (parsed.success) {
+                onQrScanned(parsed.data);
+                return;
+              }
+            }
+          } catch {
+            // fallback to jsQR
+          }
+        }
+
+        // Draw to canvas with optimal sizing
         const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imgData.data, imgData.width, imgData.height);
+        let width = img.width;
+        let height = img.height;
+        if (width > 1200 || height > 1200) {
+          const scale = 1200 / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, width, height);
+        const imgData = ctx.getImageData(0, 0, width, height);
+        const code = jsQR(imgData.data, width, height, {
+          inversionAttempts: 'attemptBoth',
+        });
 
         if (code && code.data) {
           const parsed = parseUpiQr(code.data);
@@ -175,7 +240,7 @@ export function ScanScreen({
             setErrorMessage(parsed.error);
           }
         } else {
-          setErrorMessage('No valid QR code was detected in the selected image.');
+          setErrorMessage('No valid QR code was detected in the selected image. Please try another image or enter UPI ID manually.');
         }
       };
       img.src = event.target?.result;

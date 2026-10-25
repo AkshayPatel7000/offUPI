@@ -478,7 +478,8 @@ html, body {
 /* Buttons */
 .btn-primary {
   width: 100%;
-  height: 48px;
+  height: 50px;
+  min-height: 50px;
   border-radius: var(--radius-full);
   background-color: var(--primary-blue);
   color: #FFFFFF;
@@ -492,6 +493,9 @@ html, body {
   cursor: pointer;
   box-shadow: var(--shadow-btn);
   transition: all 0.15s ease;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  text-decoration: none;
 }
 
 .btn-primary:active {
@@ -676,3 +680,138 @@ html, body {
   backdrop-filter: blur(8px);
   white-space: nowrap;
 }
+
+/* Full Height Screen Layout Wrapper (Split Scrollable Area + Sticky Footer) */
+.screen-layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.qr-details-scrollable {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 16px 20px;
+}
+
+/* Sticky Action Footer for Payment Guidance */
+.qr-sticky-footer {
+  flex-shrink: 0;
+  width: 100%;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-light);
+  padding: 12px 16px calc(14px + var(--sab));
+  box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  z-index: 40;
+}
+
+[data-theme="dark"] .qr-sticky-footer {
+  background: var(--bg-card);
+  border-top-color: var(--border-light);
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.5);
+}
+
+.qr-footer-copy-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+}
+
+.qr-footer-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background-color: var(--bg-card-soft);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.qr-footer-copy-btn:active {
+  transform: scale(0.97);
+}
+
+.qr-footer-copy-btn.copied {
+  background-color: #DCFCE7;
+  border-color: #86EFAC;
+  color: #166534;
+}
+
+[data-theme="dark"] .qr-footer-copy-btn.copied {
+  background-color: #052E16;
+  border-color: #166534;
+  color: #86EFAC;
+}
+
+/* Big Primary Dialer Action Button */
+.qr-dialer-btn {
+  width: 100%;
+  height: 52px;
+  min-height: 52px;
+  border-radius: var(--radius-full);
+  background-color: var(--primary-blue);
+  color: #FFFFFF;
+  border: none;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(11, 87, 208, 0.32);
+  transition: all 0.16s ease;
+  user-select: none;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .qr-dialer-btn {
+  background-color: #2563EB;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+}
+
+.qr-dialer-btn:hover {
+  background-color: var(--primary-blue-hover);
+  box-shadow: 0 8px 22px rgba(11, 87, 208, 0.42);
+}
+
+.qr-dialer-btn:active {
+  transform: scale(0.985);
+  background-color: var(--primary-blue-active);
+}
+
+.qr-dialer-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.qr-footer-hint {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
