@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
   Home,
-  Receipt,
   HelpCircle,
   Settings,
   Moon,
@@ -17,15 +16,10 @@ import { ChoosePaymentMethodScreen } from './screens/ChoosePaymentMethodScreen';
 import { UssdGuideScreen } from './screens/UssdGuideScreen';
 import { VoiceGuideScreen } from './screens/VoiceGuideScreen';
 import { PaymentStatusScreen } from './screens/PaymentStatusScreen';
-import { TransactionsScreen } from './screens/TransactionsScreen';
 import { HelpScreen } from './screens/HelpScreen';
 import { SettingsModal } from './screens/SettingsModal';
 import { DialerModal } from './components/DialerModal';
 import {
-  getStoredTransactions,
-  saveTransaction,
-  updateTransactionStatus,
-  clearStoredTransactions,
   getUserPreferences,
   saveUserPreferences,
 } from './lib/storage/transactions';
@@ -46,7 +40,6 @@ function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
-  const [transactions, setTransactions] = useState(() => getStoredTransactions());
   const [preferences, setPreferences] = useState(getUserPreferences);
 
   useEffect(() => {
@@ -78,23 +71,6 @@ function App() {
     showToast('QR Scanned');
   };
 
-  const handleSelectSampleQr = (sample) => {
-    const data = {
-      raw: sample.raw,
-      upiId: sample.upiId,
-      merchantName: sample.merchantName,
-      amount: sample.amount,
-      note: 'Cold Brew and Bagel',
-      currency: 'INR',
-      category: sample.category,
-      hasFixedAmount: Boolean(sample.amount),
-    };
-    setScannedQrData(data);
-    setPaymentData({ amount: sample.amount || 250, note: null });
-    setCurrentScreen('qr_details');
-    showToast(`Loaded ${sample.title}`);
-  };
-
   const handleContinueFromDetails = () => {
     if (scannedQrData?.hasFixedAmount) {
       setCurrentScreen('choose_method');
@@ -124,45 +100,7 @@ function App() {
 
   const handleCompleteDialerHandoff = () => {
     setIsDialerOpen(false);
-
-    saveTransaction({
-      merchantName: scannedQrData?.merchantName || 'The Coffee House',
-      upiId: scannedQrData?.upiId || 'coffeehouse@okaxis',
-      amount: paymentData?.amount || scannedQrData?.amount || 250,
-      note: paymentData?.note || null,
-      category: scannedQrData?.category || 'Food & Dining',
-      method: selectedCarrier.primaryMethod,
-      carrier: selectedCarrier.name,
-      status: 'initiated',
-      dialCode: dialerCode,
-    });
-
-    setTransactions(getStoredTransactions());
     setCurrentScreen('payment_status');
-  };
-
-  const handleUpdateStatus = (newStatus) => {
-    if (transactions[0]?.id) {
-      const updated = updateTransactionStatus(transactions[0].id, newStatus);
-      setTransactions(updated);
-      showToast(`Marked as ${newStatus}`);
-    }
-  };
-
-  const handleClearHistory = () => {
-    if (window.confirm('Clear locally recorded preparation history?')) {
-      clearStoredTransactions();
-      setTransactions([]);
-      showToast('History cleared');
-    }
-  };
-
-  const handleToggleOffline = () => {
-    const nextVal = !preferences.offlineSimulated;
-    const updated = { ...preferences, offlineSimulated: nextVal };
-    setPreferences(updated);
-    saveUserPreferences(updated);
-    showToast(nextVal ? 'Offline mode simulated' : 'Cellular mode restored');
   };
 
   const handleToggleDarkMode = () => {
@@ -180,10 +118,7 @@ function App() {
     showToast(`Default: ${carrierId.toUpperCase()}`);
   };
 
-  const showBottomNav =
-    currentScreen === 'home' ||
-    currentScreen === 'transactions' ||
-    currentScreen === 'help';
+  const showBottomNav = currentScreen === 'home' || currentScreen === 'help';
 
   return (
     <div className="mobile-app-shell">
@@ -201,16 +136,6 @@ function App() {
         </button>
 
         <div className="header-actions">
-          <button
-            type="button"
-            className="status-dot-btn"
-            onClick={handleToggleOffline}
-            title="Toggle offline simulated mode"
-          >
-            <span className={`dot-indicator ${preferences.offlineSimulated ? 'dot-offline' : 'dot-online'}`} />
-            <span>{preferences.offlineSimulated ? 'Offline' : 'Cellular'}</span>
-          </button>
-
           <button
             type="button"
             className="header-icon-btn"
@@ -232,7 +157,7 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <main className="app-main-content">
         {currentScreen === 'home' && (
           <HomeScreen
             carrier={selectedCarrier}
@@ -242,7 +167,6 @@ function App() {
               setInitialScanUploadMode(Boolean(opts?.uploadMode));
               setCurrentScreen(target);
             }}
-            onSelectSampleQr={handleSelectSampleQr}
           />
         )}
 
@@ -313,22 +237,13 @@ function App() {
             qrData={scannedQrData}
             paymentData={paymentData}
             onDone={() => {
-              setActiveTab('transactions');
-              setCurrentScreen('transactions');
+              setActiveTab('home');
+              setCurrentScreen('home');
             }}
-            onUpdateStatus={handleUpdateStatus}
             onNeedHelp={() => {
               setActiveTab('help');
               setCurrentScreen('help');
             }}
-          />
-        )}
-
-        {currentScreen === 'transactions' && (
-          <TransactionsScreen
-            transactions={transactions}
-            onClearTransactions={handleClearHistory}
-            onShowToast={showToast}
           />
         )}
 
@@ -353,17 +268,6 @@ function App() {
 
           <button
             type="button"
-            className={`nav-tab-btn ${activeTab === 'transactions' ? 'active' : ''}`}
-            onClick={() => handleTabChange('transactions')}
-          >
-            <div className="tab-icon-pill">
-              <Receipt size={19} />
-            </div>
-            <span>Transactions</span>
-          </button>
-
-          <button
-            type="button"
             className={`nav-tab-btn ${activeTab === 'help' ? 'active' : ''}`}
             onClick={() => handleTabChange('help')}
           >
@@ -380,8 +284,8 @@ function App() {
         isOpen={isDialerOpen}
         onClose={() => setIsDialerOpen(false)}
         initialCode={dialerCode}
-        merchantName={scannedQrData?.merchantName || 'The Coffee House'}
-        upiId={scannedQrData?.upiId || 'coffeehouse@okaxis'}
+        merchantName={scannedQrData?.merchantName || 'Merchant Payee'}
+        upiId={scannedQrData?.upiId || 'merchant@upi'}
         amount={paymentData?.amount || 250}
         carrier={selectedCarrier.name}
         onCompleteHandoff={handleCompleteDialerHandoff}
@@ -391,13 +295,10 @@ function App() {
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
-        isOfflineSimulated={preferences.offlineSimulated}
-        onToggleOffline={handleToggleOffline}
         darkMode={preferences.darkMode}
         onToggleDarkMode={handleToggleDarkMode}
         defaultCarrier={preferences.defaultCarrier}
         onChangeDefaultCarrier={handleChangeDefaultCarrier}
-        onClearHistory={handleClearHistory}
       />
 
       {/* Minimal Toast */}

@@ -139,6 +139,9 @@ html, body {
 /* Desktop Presentation Frame */
 @media (min-width: 768px) {
   body {
+    min-height: 100vh;
+    height: auto;
+    overflow-y: auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -210,40 +213,7 @@ html, body {
   gap: 6px;
 }
 
-.status-dot-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border-light);
-  background-color: var(--bg-card-soft);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
 
-.status-dot-btn:active {
-  transform: scale(0.96);
-}
-
-.dot-indicator {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-}
-
-.dot-online {
-  background-color: var(--accent-green);
-  box-shadow: 0 0 6px rgba(22, 197, 94, 0.6);
-}
-
-.dot-offline {
-  background-color: var(--accent-amber);
-  box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
-}
 
 .header-icon-btn {
   width: 32px;
@@ -268,12 +238,25 @@ html, body {
   color: var(--primary-blue);
 }
 
-/* Screen Content Area */
-.screen-container {
-  flex: 1;
+/* Main App Content Wrapper */
+.app-main-content {
+  flex: 1 1 0%;
+  min-height: 0;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 16px 16px calc(var(--bottom-nav-height) + 16px + var(--sab));
+  overflow: hidden;
+  position: relative;
+}
+
+/* Screen Content Area */
+.screen-container {
+  flex: 1 1 0%;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 16px calc(var(--bottom-nav-height) + 24px + var(--sab));
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -281,11 +264,23 @@ html, body {
   animation: fadeIn 0.16s ease-out;
 }
 
+/* Subtle, sleek custom scrollbar for desktop & modern touch */
 .screen-container::-webkit-scrollbar {
-  display: none;
+  width: 5px;
+}
+.screen-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.screen-container::-webkit-scrollbar-thumb {
+  background-color: var(--border-light);
+  border-radius: 99px;
+}
+.screen-container::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-muted);
 }
 .screen-container {
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-light) transparent;
 }
 
 @keyframes fadeIn {
@@ -351,6 +346,7 @@ html, body {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
   margin-bottom: 14px;
+  flex-shrink: 0;
 }
 
 .scan-hero-card:active {
@@ -426,6 +422,7 @@ html, body {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
 .quick-action-pill {
@@ -460,81 +457,10 @@ html, body {
   background-color: var(--bg-card-soft);
   border: 1px solid var(--border-light);
   margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
-/* Presets & Recents Section */
-.presets-section {
-  margin-bottom: 16px;
-}
 
-.presets-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  padding: 0 2px;
-}
-
-.presets-header-title {
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-}
-
-.presets-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.preset-card-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 12px 6px;
-  border-radius: var(--radius-lg);
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-light);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.preset-card-btn:active {
-  transform: scale(0.96);
-  border-color: var(--primary-blue);
-}
-
-.preset-icon-circle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  margin-bottom: 6px;
-}
-
-.preset-card-name {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 90%;
-}
-
-.preset-card-amount {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--primary-blue);
-  margin-top: 1px;
-}
 
 /* Minimal Trust Banner */
 .trust-security-pill {
@@ -545,7 +471,8 @@ html, body {
   border-radius: var(--radius-md);
   background-color: var(--bg-card-soft);
   border: 1px solid var(--border-subtle);
-  margin-top: auto;
+  margin-top: 14px;
+  flex-shrink: 0;
 }
 
 /* Buttons */

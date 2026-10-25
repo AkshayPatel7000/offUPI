@@ -157,7 +157,6 @@ export function getUserPreferences() {
         defaultCarrier: 'airtel',
         darkMode: false,
         simSlot: 'SIM 1 (Bank Linked)',
-        offlineSimulated: false,
       };
       localStorage.setItem(PREFS_KEY, JSON.stringify(defaults));
       return defaults;
@@ -168,7 +167,6 @@ export function getUserPreferences() {
       defaultCarrier: 'airtel',
       darkMode: false,
       simSlot: 'SIM 1 (Bank Linked)',
-      offlineSimulated: false,
     };
   }
 }

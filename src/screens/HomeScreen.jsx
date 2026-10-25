@@ -3,14 +3,11 @@ import {
   Keyboard,
   Image as ImageIcon,
   ShieldCheck,
-  Sparkles,
 } from 'lucide-react';
-import { SAMPLE_QR_CODES } from '../lib/qr/samples';
 import { CarrierLogo } from '../components/CarrierLogo';
 
 export function HomeScreen({
   onNavigate,
-  onSelectSampleQr,
   carrier = { id: 'airtel', name: 'Airtel', code: '*99#' },
   onSwitchCarrier,
 }) {
@@ -113,44 +110,6 @@ export function HomeScreen({
           <ImageIcon size={16} color="var(--primary-blue)" />
           <span>Upload QR</span>
         </button>
-      </div>
-
-      {/* Quick Demo Presets */}
-      <div className="presets-section">
-        <div className="presets-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Sparkles size={13} color="var(--primary-blue)" />
-            <span className="presets-header-title">Quick Demo Presets</span>
-          </div>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>1-Tap Pay</span>
-        </div>
-
-        <div className="presets-grid">
-          {SAMPLE_QR_CODES.slice(0, 3).map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className="preset-card-btn"
-              onClick={() => onSelectSampleQr(item)}
-            >
-              <div
-                className="preset-icon-circle"
-                style={{
-                  backgroundColor:
-                    item.category === 'Food & Dining'
-                      ? '#FEF3C7'
-                      : item.category === 'Shopping'
-                      ? '#E0F2FE'
-                      : '#DCFCE7',
-                }}
-              >
-                {item.category === 'Food & Dining' ? '☕' : item.category === 'Shopping' ? '🛒' : '🅿️'}
-              </div>
-              <div className="preset-card-name">{item.merchantName}</div>
-              <div className="preset-card-amount">₹{item.amount || 'Custom'}</div>
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Security & Offline Trust Pill */}

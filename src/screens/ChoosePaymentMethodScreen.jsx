@@ -168,7 +168,7 @@ export function ChoosePaymentMethodScreen({
       </div>
 
       {/* Primary CTA */}
-      <div style={{ marginTop: 20 }}>
+      <div style={{ marginTop: 20, flexShrink: 0 }}>
         <button
           type="button"
           className="btn-primary"

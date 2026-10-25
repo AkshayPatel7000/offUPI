@@ -6,11 +6,9 @@ import {
   Keyboard,
   AlertCircle,
   Camera,
-  Sparkles,
 } from 'lucide-react';
 import jsQR from 'jsqr';
 import { parseUpiQr } from '../lib/qr/parser';
-import { SAMPLE_QR_CODES } from '../lib/qr/samples';
 
 export function ScanScreen({
   onBack,
@@ -80,7 +78,7 @@ export function ScanScreen({
       } catch {
         if (isMounted) {
           setHasCameraPermission(false);
-          setErrorMessage('Camera access denied or unavailable. Use gallery upload or test presets below.');
+          setErrorMessage('Camera access denied or unavailable. Please use gallery upload or enter UPI ID manually.');
         }
       }
     }
@@ -363,7 +361,7 @@ export function ScanScreen({
                   Camera Preview Inactive
                 </div>
                 <div style={{ fontSize: 12, color: '#94A3B8', marginBottom: 14 }}>
-                  Upload a QR image file or tap a test scenario below.
+                  Upload a QR image file or enter UPI ID manually.
                 </div>
                 <button
                   type="button"
@@ -520,48 +518,6 @@ export function ScanScreen({
               <div>{errorMessage}</div>
             </div>
           )}
-
-          {/* Quick presets row */}
-          <div
-            style={{
-              backgroundColor: 'var(--bg-card-soft)',
-              borderRadius: 'var(--radius-md)',
-              padding: '12px',
-              border: '1px solid var(--border-light)',
-              marginTop: 'auto',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-              <Sparkles size={14} color="var(--primary-blue)" />
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>
-                Test Scenarios
-              </span>
-            </div>
-            <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 2 }}>
-              {SAMPLE_QR_CODES.slice(0, 3).map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => {
-                    const parsed = parseUpiQr(item.raw);
-                    if (parsed.success) onQrScanned(parsed.data);
-                  }}
-                  style={{
-                    padding: '6px 10px',
-                    borderRadius: 'var(--radius-sm)',
-                    backgroundColor: 'var(--bg-surface)',
-                    border: '1px solid var(--border-light)',
-                    fontSize: 11.5,
-                    fontWeight: 600,
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {item.title}
-                </button>
-              ))}
-            </div>
-          </div>
         </>
       )}
     </div>

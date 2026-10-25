@@ -1,10 +1,7 @@
 import {
   X,
-  Wifi,
-  WifiOff,
   Moon,
   Sun,
-  Trash2,
   Info,
 } from 'lucide-react';
 import { CARRIER_REGISTRY } from '../lib/eligibility/registry';
@@ -12,13 +9,10 @@ import { CARRIER_REGISTRY } from '../lib/eligibility/registry';
 export function SettingsModal({
   isOpen,
   onClose,
-  isOfflineSimulated,
-  onToggleOffline,
   darkMode,
   onToggleDarkMode,
   defaultCarrier,
   onChangeDefaultCarrier,
-  onClearHistory,
 }) {
   if (!isOpen) return null;
 
@@ -60,7 +54,7 @@ export function SettingsModal({
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
           <h3 style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)' }}>
-            Settings & Sandbox Controls
+            Settings & Preferences
           </h3>
           <button
             type="button"
@@ -82,63 +76,7 @@ export function SettingsModal({
           </button>
         </div>
 
-        {/* 1. Connectivity Simulator */}
-        <div
-          style={{
-            backgroundColor: 'var(--bg-card-soft)',
-            borderRadius: 'var(--radius-md)',
-            padding: '14px 16px',
-            border: '1px solid var(--border-light)',
-            marginBottom: 14,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: '50%',
-                backgroundColor: isOfflineSimulated ? 'var(--accent-amber-bg)' : 'var(--accent-green-bg)',
-                color: isOfflineSimulated ? 'var(--accent-amber)' : 'var(--accent-green)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {isOfflineSimulated ? <WifiOff size={20} /> : <Wifi size={20} />}
-            </div>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
-                Simulate Offline Mode
-              </div>
-              <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
-                {isOfflineSimulated ? 'No internet mode simulated' : 'Standard network mode'}
-              </div>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={onToggleOffline}
-            style={{
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-full)',
-              border: 'none',
-              backgroundColor: isOfflineSimulated ? 'var(--accent-amber)' : 'var(--primary-blue)',
-              color: '#FFFFFF',
-              fontSize: 12.5,
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-          >
-            {isOfflineSimulated ? 'Offline' : 'Online'}
-          </button>
-        </div>
-
-        {/* 2. Dark Mode Toggle */}
+        {/* 1. Dark Mode Toggle */}
         <div
           style={{
             backgroundColor: 'var(--bg-card-soft)',
@@ -195,7 +133,7 @@ export function SettingsModal({
           </button>
         </div>
 
-        {/* 3. Preferred Carrier */}
+        {/* 2. Preferred Carrier */}
         <div
           style={{
             backgroundColor: 'var(--bg-card-soft)',
@@ -232,33 +170,7 @@ export function SettingsModal({
           </div>
         </div>
 
-
-        {/* 5. Clear Local History */}
-        <button
-          type="button"
-          onClick={onClearHistory}
-          style={{
-            width: '100%',
-            padding: '12px',
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--accent-red)',
-            backgroundColor: 'transparent',
-            color: 'var(--accent-red)',
-            fontWeight: 700,
-            fontSize: 13,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            marginBottom: 18,
-          }}
-        >
-          <Trash2 size={16} />
-          <span>Clear Local Preparation History</span>
-        </button>
-
-        {/* 6. Technical Limitations Note (Section 13) */}
+        {/* 3. Technical & Security Note */}
         <div
           style={{
             backgroundColor: 'var(--bg-surface)',
@@ -273,7 +185,7 @@ export function SettingsModal({
         >
           <Info size={18} color="var(--primary-blue)" style={{ flexShrink: 0, marginTop: 2 }} />
           <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
-            <strong>Browser Sandbox Notice:</strong> Standard web browsers cannot programmatically query hardware SIM slot configurations or intercept telecom USSD popups due to OS security sandboxing. Future native Android wrapper can leverage <code>TelephonyManager</code> and <code>UssdResponseCallback</code> APIs.
+            <strong>Telecom Security Architecture:</strong> Web browsers operate in sandboxes without direct SIM hardware control. Payments are securely finalized through your device's native phone dialer via NPCI NUUP (*99#) or 124PAY Voice.
           </div>
         </div>
 

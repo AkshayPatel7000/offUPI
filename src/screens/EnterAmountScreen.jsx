@@ -226,6 +226,7 @@ export function EnterAmountScreen({ qrData, onBack, onContinue }) {
         disabled={!amountStr || parseFloat(amountStr) <= 0}
         style={{
           marginTop: 'auto',
+          flexShrink: 0,
           opacity: !amountStr || parseFloat(amountStr) <= 0 ? 0.6 : 1,
         }}
       >

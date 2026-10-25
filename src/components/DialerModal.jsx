@@ -153,7 +153,7 @@ function DialerModalInner({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--primary-blue)', backgroundColor: 'var(--primary-blue-subtle)', padding: '4px 10px', borderRadius: 99 }}>
-              {carrier} Telecom Simulator
+              {carrier} Telecom Session
             </span>
           </div>
           <button

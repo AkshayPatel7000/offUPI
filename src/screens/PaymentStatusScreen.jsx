@@ -130,7 +130,10 @@ export function PaymentStatusScreen({
         </div>
       </div>
 
-      {/* Status Options */}
+      {/* Status Confirmation from Bank SMS */}
+      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>
+        Confirm Outcome from Bank SMS
+      </div>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 18 }}>
         <button
           type="button"
