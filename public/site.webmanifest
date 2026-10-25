@@ -1,21 +1,26 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "Offline UPI - Pay Without Internet",
+  "short_name": "Offline UPI",
+  "description": "Scan any UPI QR code and pay merchants offline via USSD (*99#) or 124PAY Voice without mobile data.",
+  "start_url": "/?source=pwa",
+  "id": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0B57D0",
+  "theme_color": "#0B57D0",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
       "src": "/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
-  ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
-  "display": "standalone"
+  ]
 }

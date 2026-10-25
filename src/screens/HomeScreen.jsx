@@ -3,6 +3,7 @@ import {
   Keyboard,
   Image as ImageIcon,
   ShieldCheck,
+  Download,
 } from 'lucide-react';
 import { CarrierLogo } from '../components/CarrierLogo';
 
@@ -10,6 +11,9 @@ export function HomeScreen({
   onNavigate,
   carrier = { id: 'airtel', name: 'Airtel', code: '*99#' },
   onSwitchCarrier,
+  isStandalone = false,
+  canInstall = false,
+  onInstall,
 }) {
   return (
     <div className="screen-container">
@@ -111,6 +115,32 @@ export function HomeScreen({
           <span>Upload QR</span>
         </button>
       </div>
+
+      {/* PWA Install Banner */}
+      {!isStandalone && canInstall && (
+        <div
+          className="pwa-install-banner"
+          onClick={onInstall}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              onInstall?.();
+            }
+          }}
+        >
+          <div className="pwa-install-icon">
+            <Download size={18} />
+          </div>
+          <div className="pwa-install-content">
+            <div className="pwa-install-title">Install App on Device</div>
+            <div className="pwa-install-sub">Instant home screen access • Works 100% offline</div>
+          </div>
+          <button type="button" className="pwa-install-action-btn" tabIndex={-1}>
+            Install
+          </button>
+        </div>
+      )}
 
       {/* Security & Offline Trust Pill */}
       <div className="trust-security-pill">
