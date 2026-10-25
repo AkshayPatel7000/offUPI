@@ -1,0 +1,20 @@
+{
+  "name": "Offline UPI Assistant - OffPay",
+  "short_name": "OffPay",
+  "description": "Prepare UPI payments and pay offline via USSD (*99#) or 124PAY Voice when mobile data is unavailable.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F4F8FD",
+  "theme_color": "#0B57D0",
+  "categories": ["finance", "utilities", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
